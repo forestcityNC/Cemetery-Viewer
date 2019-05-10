@@ -48,6 +48,7 @@ var map = L.map('map', {
 
 		L.control.layers(baseLayers).addTo(map);
 
+
 // Add Cemetery Plots //
 $.getJSON("./data/cemetery_A.geojson",function(data){
   L.geoJson(data).addTo(map);
