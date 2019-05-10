@@ -9,6 +9,10 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
 
+
+<!-- <script src="https://unpkg.com/geotiff@0.4.1/dist/main.js"></script>
+<script src="js/leaflet-geotiff.js"></script> -->
+
 <!-- JQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 
@@ -21,29 +25,33 @@
 <div id="map" style="width: 705px; height: 375px"></div>
 
 <script>
-
 // var mapboxToken = 'pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ';
 
 // Add Basemaps //
 var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri'});
-var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 19});
+var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 21});
 
 // Load Map and Controller //
 var map = L.map('map', {
-			    layers: [satellite] // only add one!
+			    layers: [carto] // only add one!
 		    })
-		    .setView([35.339744, -81.871195], 17);
+		    .setView([35.339344, -81.871195], 18);
 
 		var baseLayers = {
-      "Satellite": satellite,
-			"Plain Base": carto
+      "Plain Base": carto,
+      "Satellite": satellite
 		};
 
-    // var overlays = {
-		//	"Interesting places": coolPlaces
-		// };
+  //  var overlay = {
+	//	    "Cemetery Image": cemetery
+	//	};
 
 		L.control.layers(baseLayers).addTo(map);
+
+// Add Cemetery Plots //
+$.getJSON("./data/cemetery_A.geojson",function(data){
+  L.geoJson(data).addTo(map);
+});
 
 
 
