@@ -16,13 +16,9 @@
 <!-- JQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 
-<style>
-    #map{ height: 100% }
-</style>
-
 </head>
 <body>
-<div id="map" style="width: 705px; height: 375px"></div>
+<div id="map" style="width: 1000px; height:700px"></div>
 
 <script>
 // var mapboxToken = 'pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ';
@@ -51,9 +47,20 @@ var map = L.map('map', {
 
 // Add Cemetery Plots //
 $.getJSON("./data/cemetery_A.geojson",function(data){
-  L.geoJson(data).addTo(map);
+  var plots_a = L.geoJson(data, {
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(
+        feature.properties.cemetery_plot_a_PURCHASER_FN +
+        " " +
+        feature.properties.cemetery_plot_a_PURCHASER_LN);
+    }
+  })
+  plots_a.addTo(map);
 });
 
+
+
+// Cemetery Image Overlay //
 var image = L.imageOverlay(
          'data/cemetery.png',
          [[35.3384289150000015, -81.8729286509999952], [35.3413388549999965, -81.8691185509999997]], {
