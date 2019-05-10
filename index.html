@@ -48,6 +48,9 @@ var map = L.map('map', {
 
 		L.control.layers(baseLayers).addTo(map);
 
+var imageUrl = "./data/cemetery.png",
+    imageBounds = [[-81.8729286509999952,35.3384289150000015], [-81.8691185509999997,35.3413388549999965]];
+L.imageOverlay(imageUrl, imageBounds).addTo(map);
 
 // Add Cemetery Plots //
 $.getJSON("./data/cemetery_A.geojson",function(data){
