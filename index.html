@@ -28,18 +28,19 @@
 // var mapboxToken = 'pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ';
 
 // Add Basemaps //
-var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri'});
-var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom: 21});
+var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 21});
+var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom:21});
 
 // Load Map and Controller //
 var map = L.map('map', {
-			    layers: [carto] // only add one!
+			    layers: [satellite] // only add one!
 		    })
 		    .setView([35.339344, -81.871195], 18);
 
 		var baseLayers = {
-      "Plain Base": carto,
-      "Satellite": satellite
+      "Satellite": satellite,
+      "Plain Base": carto
+
 		};
 
   //  var overlay = {
@@ -48,16 +49,16 @@ var map = L.map('map', {
 
 		L.control.layers(baseLayers).addTo(map);
 
-var imageUrl = "./data/cemetery.png",
-    imageBounds = [[-81.8729286509999952,35.3384289150000015], [-81.8691185509999997,35.3413388549999965]];
-L.imageOverlay(imageUrl, imageBounds).addTo(map);
-
 // Add Cemetery Plots //
 $.getJSON("./data/cemetery_A.geojson",function(data){
   L.geoJson(data).addTo(map);
 });
 
-
+var image = L.imageOverlay(
+         'data/cemetery.png',
+         [[35.3384289150000015, -81.8729286509999952], [35.3413388549999965, -81.8691185509999997]], {
+         opacity: 1
+     }).addTo(map);
 
 
 
