@@ -31,7 +31,7 @@ var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}
 var map = L.map('map', {
 			    layers: [satellite] // only add one!
 		    })
-		    .setView([35.339344, -81.871195], 18);
+		    .setView([35.339344, -81.871195], 19);
 
 		var baseLayers = {
       "Satellite": satellite,
@@ -44,6 +44,12 @@ var map = L.map('map', {
 	//	};
 
 		L.control.layers(baseLayers).addTo(map);
+    // Cemetery Image Overlay //
+    var image = L.imageOverlay(
+             'data/cemetery.png',
+             [[35.3384289150000015, -81.8729286509999952], [35.3413388549999965, -81.8691185509999997]], {
+             opacity: 1
+         }).addTo(map);
 
 // Add Cemetery Plots //
 var plotstyle = {
@@ -56,10 +62,15 @@ $.getJSON("./data/cemetery_A.geojson",function(data){
   var plots_a = L.geoJson(data, {
     style: plotstyle,
     onEachFeature: function (feature, layer) {
-      layer.bindPopup(
-        feature.properties.cemetery_plot_a_PURCHASER_FN +
-        " " +
-        feature.properties.cemetery_plot_a_PURCHASER_LN);
+      var popupContent =
+        "<h3>" + "A " +  feature.properties.LOT_NUM + "</h3>" +
+        "<table>" +
+        "<tr>" + "<th>Owner:</th>" + "<td>" + feature.properties.OWNER_FIRST_NAME + " " + feature.properties.OWNER_LAST_NAME + "</td>" + "</tr>" +
+        "<tr>" + "<th>Purchase Date:</th>" + "<td>" + feature.properties.PURCHSE_DATE + "</td>" + "</tr>" +
+        "<tr>" + "<th>Previous Owner:</th>" + "<td>" + feature.properties.PREVIOUS_OWNER_LN + " " + feature.properties.PREVIOUS_OWNER_FN + "</td>" + "</tr>" +
+        "</table>"
+
+      layer.bindPopup(popupContent);
     }
   })
   plots_a.addTo(map);
@@ -67,12 +78,6 @@ $.getJSON("./data/cemetery_A.geojson",function(data){
 
 
 
-// Cemetery Image Overlay //
-var image = L.imageOverlay(
-         'data/cemetery.png',
-         [[35.3384289150000015, -81.8729286509999952], [35.3413388549999965, -81.8691185509999997]], {
-         opacity: 1
-     }).addTo(map);
 
 
 
