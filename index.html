@@ -5,16 +5,18 @@
   <title>Cool Springs Cemetery Viewer</title>
 
 
-<!-- Leaflet  -->
+<!-- CSS-->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+<link rel="stylesheet" href="./css/modern-ui.css" />
 
 
 <!-- <script src="https://unpkg.com/geotiff@0.4.1/dist/main.js"></script>
 <script src="js/leaflet-geotiff.js"></script> -->
 
-<!-- JQuery -->
+<!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
+<script src="./js/leaflet-search.js"> </script>
 
 </head>
 <body>
@@ -57,22 +59,26 @@ var plotstyle = {
     "weight": 1,
     "opacity": 0.65
 };
-
+//
 $.getJSON("./data/cemetery_A.geojson",function(data){
   var plots_a = L.geoJson(data, {
     style: plotstyle,
     onEachFeature: function (feature, layer) {
-      var popupContent =
-        "<h3>" + "A " +  feature.properties.LOT_NUM + "</h3>" +
+      layer.bindPopup(
+        '<h3>' + 'A ' + feature.properties.LOT_NUM + '</h3>' +
         "<table>" +
-        "<tr>" + "<th>Owner:</th>" + "<td>" + feature.properties.OWNER_FIRST_NAME + " " + feature.properties.OWNER_LAST_NAME + "</td>" + "</tr>" +
-        "<tr>" + "<th>Purchase Date:</th>" + "<td>" + feature.properties.PURCHSE_DATE + "</td>" + "</tr>" +
-        "<tr>" + "<th>Previous Owner:</th>" + "<td>" + feature.properties.PREVIOUS_OWNER_LN + " " + feature.properties.PREVIOUS_OWNER_FN + "</td>" + "</tr>" +
+        // ternary operator conditional statement to remove null values (how to remove null rows )
+        "<tr>" + '<th>Owner: </th>'+ "<td>" + (feature.properties.OWNER_FULL ? feature.properties.OWNER_FULL : '') + "</td>" + "</tr>" +
+        // trying to have some rows invisible if null, below does not yet achieve this
+        (feature.properties.OWNER_B_FULL ? "<tr>" + '<th>Owner B: </th>' + "<td>" + feature.properties.OWNER_B_FULL : '') + "</td>" + "</tr>" +
+        "<tr>" + '<th>Purchase Date: </th>'+ "<td>" + (feature.properties.PURCHSE_DATE ? feature.properties.PURCHSE_DATE : '') + "</td>" + "</tr>" +
+        "<tr>" + '<th>Previous Owner: </th>'+ "<td>" + (feature.properties.PREVIOUS_OWNER ? feature.properties.PREVIOUS_OWNER : '') + "</td>" + "</tr>" +
         "</table>"
 
-      layer.bindPopup(popupContent);
-    }
-  })
+
+      )},
+
+  });
   plots_a.addTo(map);
 });
 
