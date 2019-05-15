@@ -7,20 +7,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 <!--leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@0.7.7/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@0.7.7/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
 
 <!-- CSS-->
-<link rel="stylesheet" href="./css/custom-leaflet-0.7.css" />
-<link rel="stylesheet" href="./css/modern-ui.css" />
-
-
-
 
 
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script src="./js/custom-leaflet-0.7.js"> </script>
 <script src="./js/leaflet.ajax.min.js"> </script>
 
 
@@ -117,34 +111,7 @@ var map = L.map('map', {
     /*Attribution Toggle and OSM Edit Link*/
     //remove existing attribution control by hiding it only on mobile
     //make sure the normal control is hidden
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    style.innerHTML = '.leaflet-control-attribution {display: none;};@media screen and (max-width:768px) {.elevation.leaflet-control {display:none}}';
-    document.getElementsByTagName('head')[0].appendChild(style);
 
-    if (L.Browser.mobile) {
-      console.log('mobile');
-      var toggleAttribution = L.Control.extend({
-        options: { position: 'bottomright' },
-        onAdd: function (map) {
-          this._div = L.DomUtil.create('button', 'btn btn-link');
-          this._div.innerHTML = "Leaflet | Map Tiles";
-          L.DomEvent.on(this._div, 'click', this._click);
-          return this._div;
-        },
-
-        _click: function (e) {
-          L.DomEvent.stop(e);
-          x = document.getElementsByClassName("leaflet-control-attribution")[0];
-          x.style.display = x.style.display === 'block' ? '' : 'block';
-        },
-
-      });
-      map.addControl(new toggleAttribution());
-    }else{
-      x = document.getElementsByClassName("leaflet-control-attribution")[0];
-      x.style.display = x.style.display === 'block' ? '' : 'block';
-    }
 
 // Add Cemetery Plot Style //
 var plotstyle = {
@@ -153,201 +120,7 @@ var plotstyle = {
     "opacity": 0.65
 };
 
-// Start Toolbar //
-console.log('start map toolbar');
 
-var overlays;
-var sidebar = L.control.sidebar('sidebar', { autoPan: false, closeButton: false });
-sidebar.addTo(map);
-
-var hash = L.hash(map);
-var gpsLocate = L.control.locate({follow: true, locateOptions: {enableHighAccuracy: true}});
-//gpsLocate.addTo(map);
-var homeExtent = L.control.defaultExtent({});
-//homeExtent.addTo(map);
-var fullscreen = L.control.fullscreen();
-
-var sidebarToggle = L.easyButton({
-      states: [{
-              stateName: 'open-sidebar',   // name the state
-              icon:      'fa-bars fa-lg',          // and define it's properties
-              title:     'Show Sidebar', // like it's title
-              onClick: function(btn, map) {  // and it's callback
-                  sidebar.show();
-                  btn.state('close-sidebar'); // change state on click!
-              }
-          }, {
-              stateName: 'close-sidebar',
-              icon:      'fa-times fa-2x',
-              title:     'Hide Sidebar',
-              onClick: function(btn, map) {
-                  sidebar.hide();
-                  btn.state('open-sidebar');
-              }
-      }],
-    id: 'menu',
- });
-var stogglebar = L.easyBar([sidebarToggle], {id: 'toggle'}).addTo(map);
-var leafletprint = L.easyPrint();
-//end toolbar
-sidebar.on('hide', function () {
-    sidebarToggle.state('open-sidebar');
-});
-sidebar.on('show', function () {
-    sidebarToggle.state('close-sidebar');
-});
-
-var globalsearchToggle = new L.easyButton({
-    states: [{
-      stateName: 'show',
-      icon: 'fa-exchange fa-lg',
-      title: 'Search Plot Owner',
-      onClick: function(btn, map) {
-        osmsearch.addTo(map);
-      btn.state('hide');
-        }
-      },{
-      stateName: 'hide',
-    icon: 'fa-exchange fa-border fa-lg',
-      title: 'Search Gravesite',
-      onClick: function(btn, map) {
-        map.removeControl(osmsearch);
-        btn.state('show');
-      }
-    }]
-  });
-
-var sidebarToggle = L.easyButton({
-      states: [{
-              stateName: 'open-sidebar',   // name the state
-              icon:      'fa-bars fa-lg',          // and define it's properties
-              title:     'Show Sidebar', // like it's title
-              onClick: function(btn, map) {  // and it's callback
-                  sidebar.show();
-                  btn.state('close-sidebar'); // change state on click!
-              }
-          }, {
-              stateName: 'close-sidebar',
-              icon:      'fa-times fa-2x',
-              title:     'Hide Sidebar',
-              onClick: function(btn, map) {
-                  sidebar.hide();
-                  btn.state('open-sidebar');
-              }
-      }],
-    id: 'menu',
- });
-
-var toolshidden = false;
-var mobilescreen = false;
-var tools = L.easyButton({
-      states: [{
-              stateName: 'show-tools',   // name the state
-              icon:      'fa-cogs fa-lg',          // and define it's properties
-              title:     'Show Map Tools', // like it's title
-              onClick: function(btn, map) {  // and it's callback
-                  leafletprint.addTo(map);
-                  gpsLocate.addTo(map);
-                  homeExtent.addTo(map);
-                  fullscreen.addTo(map);
-
-                  globalsearchToggle.addTo(map);
-
-                  btn.state('hide-tools'); // change state on click!
-                  toolshidden = false;
-                  //console.log(toolshidden + ' state changed to hideTools');
-              }
-          }, {
-              stateName: 'hide-tools',
-              icon:      'fa-cogs fa-border fa-lg',
-              title:     'Hide Map Tools',
-              onClick: function(btn, map) {
-                  map.removeControl(leafletprint);
-                  map.removeControl(gpsLocate);
-                  map.removeControl(homeExtent);
-                  map.removeControl(fullscreen);
-
-                  map.removeControl(globalsearchToggle);
-
-                  btn.state('show-tools');
-                  toolshidden = true;
-                  //console.log(toolshidden+ ' state changed to showTools');
-              }
-      }],
-    id: 'tools',
- });
-console.log('tools loaded');
-
-var w = window.innerWidth;
-console.log('screen width: ' + w);
-if (w < 481) {
-  tools.addTo(map);
-  toolshidden = true;
-  mobilescreen = true;
-  //console.log('mobile tool toggle');
-  //console.log(toolshidden + "mobilescreen: " + mobilescreen);
-}else{
-  leafletprint.addTo(map);
-  gpsLocate.addTo(map);
-  homeExtent.addTo(map);
-  fullscreen.addTo(map);
-
-  globalsearchToggle.addTo(map);
-
-  toolshidden = false;
-  //console.log(toolshidden + " " + mobilescreen);
-}
-window.onresize = function() {
-  if ( toolshidden === true && window.innerWidth > 480 && mobilescreen === true) {
-    leafletprint.addTo(map);
-    gpsLocate.addTo(map);
-    homeExtent.addTo(map);
-    fullscreen.addTo(map);
-
-    globalsearchToggle.addTo(map);
-
-    map.removeControl(tools);
-    toolshidden = false;
-    mobilescreen = false;
-    //console.log(toolshidden + " " + mobilescreen);
-  }
-  else if ( toolshidden === false && mobilescreen === true && window.innerWidth > 481) {
-    tools.state('show-tools');
-    mobilescreen = false;
-    map.removeControl(tools);
-    //console.log(toolshidden + "" + mobilescreen);
-  }
-  else if ( toolshidden === false && window.innerWidth < 481 && mobilescreen === false) {
-    map.removeControl(leafletprint);
-    map.removeControl(gpsLocate);
-    map.removeControl(homeExtent);
-    map.removeControl(fullscreen);
-
-    map.removeControl(globalsearchToggle);
-
-    tools.addTo(map);
-    toolshidden = true;
-    mobilescreen = true;
-    //console.log(toolshidden + " " + mobilescreen);
-  }
-  else {}
-};
-//--end tools toggle
-
-//Close Layer Control on Layer Change
-//Close Layer Control on Layer Change on mobile
-map.on('baselayerchange', function() {
- if (L.Browser.mobile) {
-   map.on('baselayerchange', function() {
-     setTimeout(function() {
-       $(".leaflet-control-layers").removeClass("leaflet-control-layers-expanded");
-     },5000);
-   });
- }
-});
-//end mobile tools menu
-
-var loading = L.Control.loading({position:'topright'}).addTo(map);
 //end OVRDC Modern UI Toolbar
 
 // Load Cemetery Data

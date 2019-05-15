@@ -20,7 +20,7 @@ only screen and (-o-min-device-pixel-ratio: 3/2),
 only screen and (min-device-pixel-ratio: 1.5) {
     .leaflet-control-defaultextent-toggle {
         /*background-image: url('leaflet.defaultextent@2X.png');*/
-        background-image: url('images/earth.png');
+        background-image: url('./images/earth.png');
         background-size: 23px;
         /*background-size: 26px 26px;*/
         background-repeat: no-repeat;
@@ -28,7 +28,7 @@ only screen and (min-device-pixel-ratio: 1.5) {
 }
 
 .leaflet-control-easyPrint a {
-  background:#fff url(images/print.png) no-repeat 5px;
+  background:#fff url(./images/print.png) no-repeat 5px;
   background-size:16px 16px;
   display: block;
   }
