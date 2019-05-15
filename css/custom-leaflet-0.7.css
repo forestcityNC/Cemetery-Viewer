@@ -6,7 +6,7 @@
   text-indent: -9999px;
   white-space: nowrap;
   /*background-image: url('leaflet.defaultextent.png');*/
-  background-image: url('images/earth.png');
+  background-image: url('./images/earth.png');
   background-size: 23px;
   /*width: 26px;
   height: 26px;*/
@@ -536,7 +536,7 @@ Version: 1.0
 	line-height: 30px;
 	}
 .leaflet-control-fullscreen a {
-  background:#fff url(images/fullscreen.png) no-repeat 0 0;
+  background:#fff url(./images/fullscreen.png) no-repeat 0 0;
   background-size:26px 52px;
   }
   .leaflet-fullscreen-on .leaflet-control-fullscreen a {
@@ -590,7 +590,7 @@ Version: 1.0
 }
 .leaflet-control-layers-toggle,
 .leaflet-touch .leaflet-control-layers-toggle {
-  background-image: url(images/layers-bl.png);
+  background-image: url(./images/layers-bl.png);
   background-size: 80%;
   margin-top: 0px;
 	width:36px;
@@ -930,5 +930,3 @@ Version: 1.0
 
 
 .leaflet-pane.leaflet-ie10-visual-click-pane-pane { z-index: 300; }
-
-

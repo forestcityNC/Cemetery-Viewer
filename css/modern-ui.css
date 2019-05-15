@@ -203,7 +203,7 @@ background: transparent;
 }
 /*Leaflet Search*/
 .leaflet-control-search .search-input {
-	width: 70%;
+	width: 80%;
 }
 .leaflet-control-search .search-tooltip {
   background-color: #fff;
