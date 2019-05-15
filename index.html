@@ -6,21 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
+<!--leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@0.7.7/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@0.7.7/dist/leaflet.js"></script>
 
 <!-- CSS-->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
-<link rel="stylesheet" href="./css/modern-ui.css" />
 <link rel="stylesheet" href="./css/custom-leaflet-0.7.css" />
+<link rel="stylesheet" href="./css/modern-ui.css" />
 
 
-<!-- <script src="https://unpkg.com/geotiff@0.4.1/dist/main.js"></script>
-<script src="js/leaflet-geotiff.js"></script> -->
+
+
 
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
-<script src="./js/leaflet.ajax.min.js"> </script>
 <script src="./js/custom-leaflet-0.7.js"> </script>
+<script src="./js/leaflet.ajax.min.js"> </script>
+
 
 
 </head>
@@ -46,8 +48,8 @@
       <button id="hideTools" type="button" class="btn btn-default btn-xs btn-block" style="display:none;">Hide Map Tools Legend</button>
       <div class="toolLegend" style="display:none;">
         <hr />
-        <div class="list-group" style="text-align:left;">
-          <div class="list-group" style="text-align:left;">
+      <div class="list-group" style="text-align:left;">
+      <div class="list-group" style="text-align:left;">
        <li class="list-group-item"><i class='fa fa-bars fa-fw fa-lg'></i> Open Sidebar</li>
        <li class="list-group-item"><i class='fa fa-exchange fa-fw fa-lg'></i> Toggle Address Search</li>
        <li class="list-group-item"><img src="images/fullscreen.png" style="padding:0 1px;width:22px;"></img> Fullscreen</li>
