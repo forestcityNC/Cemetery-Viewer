@@ -8,6 +8,7 @@
 <!-- CSS-->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
 <link rel="stylesheet" href="./css/modern-ui.css" />
+<link rel="stylesheet" href="./css/ovrdc-map-plugins-leaflet-0.7.css" />
 
 
 <!-- <script src="https://unpkg.com/geotiff@0.4.1/dist/main.js"></script>
@@ -17,10 +18,20 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg==" crossorigin=""></script>
 <script src="./js/leaflet-search.js"> </script>
+<script src="./js/leaflet.defaultExtent.js"> </script>
+<script src="./js/Leaflet.fullscreen.min.js"> </script>
+<script src="./js/leaflet.ajax.min.js"> </script>
+<script src="./js/ovrdc-map-plugins-leaflet-0.7.js"> </script>
+
 
 </head>
 <body>
-<div id="map" style="width: 1000px; height:700px"></div>
+<div id="map" style="width: 1000px; height:700px">
+  <div id="sidebar">
+      <h1>leaflet-sidebar</h1>
+  </div>
+
+</div>
 
 <script>
 // var mapboxToken = 'pk.eyJ1IjoiZGJoYXJyaXM5MiIsImEiOiJjamo1dm5hOGswOHMzM2tubm12OGhjdXdzIn0.MXeiHXd9767rehYZ2fBVHQ';
@@ -28,16 +39,17 @@
 // Add Basemaps //
 var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: 'Tiles &copy; Esri', maxZoom: 21});
 var carto = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd', maxZoom:21});
-
+var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 22, attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',});
 // Load Map and Controller //
 var map = L.map('map', {
 			    layers: [satellite] // only add one!
 		    })
-		    .setView([35.339344, -81.871195], 19);
+		    .setView([35.339344, -81.871195], 18);
 
 		var baseLayers = {
       "Satellite": satellite,
-      "Plain Base": carto
+      "Plain Base": carto,
+      "Open Street Map": osm
 
 		};
 
@@ -53,15 +65,212 @@ var map = L.map('map', {
              opacity: 1
          }).addTo(map);
 
-// Add Cemetery Plots //
+// Add Cemetery Plot Style //
 var plotstyle = {
     "color": "#000000",
     "weight": 1,
     "opacity": 0.65
 };
-//
-$.getJSON("./data/cemetery_A.geojson",function(data){
-  var plots_a = L.geoJson(data, {
+
+// Start Toolbar //
+console.log('start map toolbar');
+
+var overlays;
+var sidebar = L.control.sidebar('sidebar', { autoPan: false, closeButton: false });
+sidebar.addTo(map);
+
+var hash = L.hash(map);
+var gpsLocate = L.control.locate({follow: true, locateOptions: {enableHighAccuracy: true}});
+//gpsLocate.addTo(map);
+var homeExtent = L.control.defaultExtent({});
+//homeExtent.addTo(map);
+var fullscreen = L.control.fullscreen();
+
+var sidebarToggle = L.easyButton({
+      states: [{
+              stateName: 'open-sidebar',   // name the state
+              icon:      'fa-bars fa-lg',          // and define it's properties
+              title:     'Show Sidebar', // like it's title
+              onClick: function(btn, map) {  // and it's callback
+                  sidebar.show();
+                  btn.state('close-sidebar'); // change state on click!
+              }
+          }, {
+              stateName: 'close-sidebar',
+              icon:      'fa-times fa-2x',
+              title:     'Hide Sidebar',
+              onClick: function(btn, map) {
+                  sidebar.hide();
+                  btn.state('open-sidebar');
+              }
+      }],
+    id: 'menu',
+ });
+var stogglebar = L.easyBar([sidebarToggle], {id: 'toggle'}).addTo(map);
+var leafletprint = L.easyPrint();
+//end toolbar
+sidebar.on('hide', function () {
+    sidebarToggle.state('open-sidebar');
+});
+sidebar.on('show', function () {
+    sidebarToggle.state('close-sidebar');
+});
+
+var globalsearchToggle = new L.easyButton({
+    states: [{
+      stateName: 'show',
+      icon: 'fa-exchange fa-lg',
+      title: 'Search Plot Owner',
+      onClick: function(btn, map) {
+        osmsearch.addTo(map);
+      btn.state('hide');
+        }
+      },{
+      stateName: 'hide',
+    icon: 'fa-exchange fa-border fa-lg',
+      title: 'Search Gravesite',
+      onClick: function(btn, map) {
+        map.removeControl(osmsearch);
+        btn.state('show');
+      }
+    }]
+  });
+
+var sidebarToggle = L.easyButton({
+      states: [{
+              stateName: 'open-sidebar',   // name the state
+              icon:      'fa-bars fa-lg',          // and define it's properties
+              title:     'Show Sidebar', // like it's title
+              onClick: function(btn, map) {  // and it's callback
+                  sidebar.show();
+                  btn.state('close-sidebar'); // change state on click!
+              }
+          }, {
+              stateName: 'close-sidebar',
+              icon:      'fa-times fa-2x',
+              title:     'Hide Sidebar',
+              onClick: function(btn, map) {
+                  sidebar.hide();
+                  btn.state('open-sidebar');
+              }
+      }],
+    id: 'menu',
+ });
+
+var toolshidden = false;
+var mobilescreen = false;
+var tools = L.easyButton({
+      states: [{
+              stateName: 'show-tools',   // name the state
+              icon:      'fa-cogs fa-lg',          // and define it's properties
+              title:     'Show Map Tools', // like it's title
+              onClick: function(btn, map) {  // and it's callback
+                  leafletprint.addTo(map);
+                  gpsLocate.addTo(map);
+                  homeExtent.addTo(map);
+                  fullscreen.addTo(map);
+
+                  globalsearchToggle.addTo(map);
+
+                  btn.state('hide-tools'); // change state on click!
+                  toolshidden = false;
+                  //console.log(toolshidden + ' state changed to hideTools');
+              }
+          }, {
+              stateName: 'hide-tools',
+              icon:      'fa-cogs fa-border fa-lg',
+              title:     'Hide Map Tools',
+              onClick: function(btn, map) {
+                  map.removeControl(leafletprint);
+                  map.removeControl(gpsLocate);
+                  map.removeControl(homeExtent);
+                  map.removeControl(fullscreen);
+
+                  map.removeControl(globalsearchToggle);
+
+                  btn.state('show-tools');
+                  toolshidden = true;
+                  //console.log(toolshidden+ ' state changed to showTools');
+              }
+      }],
+    id: 'tools',
+ });
+console.log('tools loaded');
+
+var w = window.innerWidth;
+console.log('screen width: ' + w);
+if (w < 481) {
+  tools.addTo(map);
+  toolshidden = true;
+  mobilescreen = true;
+  //console.log('mobile tool toggle');
+  //console.log(toolshidden + "mobilescreen: " + mobilescreen);
+}else{
+  leafletprint.addTo(map);
+  gpsLocate.addTo(map);
+  homeExtent.addTo(map);
+  fullscreen.addTo(map);
+
+  globalsearchToggle.addTo(map);
+
+  toolshidden = false;
+  //console.log(toolshidden + " " + mobilescreen);
+}
+window.onresize = function() {
+  if ( toolshidden === true && window.innerWidth > 480 && mobilescreen === true) {
+    leafletprint.addTo(map);
+    gpsLocate.addTo(map);
+    homeExtent.addTo(map);
+    fullscreen.addTo(map);
+
+    globalsearchToggle.addTo(map);
+
+    map.removeControl(tools);
+    toolshidden = false;
+    mobilescreen = false;
+    //console.log(toolshidden + " " + mobilescreen);
+  }
+  else if ( toolshidden === false && mobilescreen === true && window.innerWidth > 481) {
+    tools.state('show-tools');
+    mobilescreen = false;
+    map.removeControl(tools);
+    //console.log(toolshidden + "" + mobilescreen);
+  }
+  else if ( toolshidden === false && window.innerWidth < 481 && mobilescreen === false) {
+    map.removeControl(leafletprint);
+    map.removeControl(gpsLocate);
+    map.removeControl(homeExtent);
+    map.removeControl(fullscreen);
+
+    map.removeControl(globalsearchToggle);
+
+    tools.addTo(map);
+    toolshidden = true;
+    mobilescreen = true;
+    //console.log(toolshidden + " " + mobilescreen);
+  }
+  else {}
+};
+//--end tools toggle
+
+//Close Layer Control on Layer Change
+//Close Layer Control on Layer Change on mobile
+map.on('baselayerchange', function() {
+ if (L.Browser.mobile) {
+   map.on('baselayerchange', function() {
+     setTimeout(function() {
+       $(".leaflet-control-layers").removeClass("leaflet-control-layers-expanded");
+     },5000);
+   });
+ }
+});
+//end mobile tools menu
+
+var loading = L.Control.loading({position:'topright'}).addTo(map);
+//end OVRDC Modern UI Toolbar
+
+// Load Cemetery Data
+var plots = L.geoJson.ajax("./data/cemetery_A.geojson", {
     style: plotstyle,
     onEachFeature: function (feature, layer) {
       layer.bindPopup(
@@ -74,16 +283,25 @@ $.getJSON("./data/cemetery_A.geojson",function(data){
         "<tr>" + '<th>Purchase Date: </th>'+ "<td>" + (feature.properties.PURCHSE_DATE ? feature.properties.PURCHSE_DATE : '') + "</td>" + "</tr>" +
         "<tr>" + '<th>Previous Owner: </th>'+ "<td>" + (feature.properties.PREVIOUS_OWNER ? feature.properties.PREVIOUS_OWNER : '') + "</td>" + "</tr>" +
         "</table>"
-
-
       )},
+  }).addTo(map);
 
-  });
-  plots_a.addTo(map);
-});
-
-
-
+  //Feature search
+  var search = new L.Control.Search({
+    layer: plots,
+    initial: true,
+    propertyName: 'OWNER_LAST_NAME',
+    circleLocation:false,
+    collapsed:false,
+    textPlaceholder:'Search By Plot Owner Last Name',
+    zoom:'19'});
+  search.on('search_locationfound', function() { map.setZoom(22); });
+  search.on ('search_locationfound', function(e) {
+      e.layer.fire('click');
+      search.collapse();
+    });
+  map.addControl(search);
+  //end feature search
 
 
 
